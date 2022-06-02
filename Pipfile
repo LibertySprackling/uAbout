@@ -4,8 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+flask = "*"
+gunicorn = "*"
+flask-cors = "*"
+flask-sqlalchemy = "*"
+flask-dotenv = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.10"
+
+[scripts]
+init_db = "python init_db.py"
+dev = "flask run -p ${PORT}"
+start = "gunicorn listings:app"
