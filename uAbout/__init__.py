@@ -9,11 +9,14 @@ from .routes.main import main_routes
 load_dotenv()
 
 database_uri=environ.get('DATABASE_URL')
+if 'postgres' in database_uri:
+    database_uri=database_uri.replace('postgres:', 'postgresql:')
 
 app = Flask(__name__)
 app.config.update(
     SQLALCHEMY_DATABASE_URI=database_uri,
-    SQLALCHEMY_TRACK_NOTIFICATIONS=environ.get('SQL_ALCEHMY_TRACK_MODIFICATIONS')
+    SQLALCHEMY_TRACK_NOTIFICATIONS=environ.get('SQL_ALCEHMY_TRACK_MODIFICATIONS'),
+    SQLALCHEMY_ECHO=True
 )
 
 CORS(app)

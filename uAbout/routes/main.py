@@ -1,6 +1,5 @@
 from flask import Blueprint, request, render_template
 from ..database.db import db
-from ..models.uAbout import uAbout
 
 main_routes = Blueprint("example", __name__)
 

@@ -8,7 +8,8 @@ flask = "*"
 gunicorn = "*"
 flask-cors = "*"
 flask-sqlalchemy = "*"
-flask-dotenv = "*"
+python-dotenv = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
@@ -18,4 +19,4 @@ python_version = "3.10"
 [scripts]
 init_db = "python init_db.py"
 dev = "flask run -p ${PORT}"
-start = "gunicorn listings:app"
+start = "gunicorn uAbout:app"
