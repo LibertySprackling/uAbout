@@ -1,13 +1,9 @@
-from flask import Blueprint, request, abort, jsonify, render_template
-from flask_bcrypt import Bcrypt
+from flask import Blueprint, request, jsonify, render_template
+import bcrypt
 from ..models.user import User
 from ..database.db import db
 
 auth_routes = Blueprint("auth", __name__)
-
-@auth_routes.route("/login")
-def login():
-    return 200
 
 @auth_routes.route("/logout")
 def logout():
@@ -18,20 +14,42 @@ def register_user():
     if request.method == "GET":
         return render_template("register.html")
     elif request.method == "POST":
-        email = request.json["email"]
-        password = request.json["password"]
+        email = request.json.get("email", None)
+        password = request.json.get("password", None)
 
-        user_exists = User.query.filter_by(email=email).first() is not None
+        if not email:
+            return "Missing email", 400
+        
+        if not password:
+            return "Missing password", 400
 
-        if user_exists:
-            abort(409)
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        hashed_password = bcrypt.generate_password_hash(password)
-        new_user = User(email=email, password=hashed_password)
-        db.session.add(new_user)
+        user = User(email=email, hash=hashed)
+
+        db.session.add(user)
         db.session.commit()
 
-        return jsonify({
-            "id": new_user.id,
-            "email": new_user.email
-        })
+        return f"Welcome {email}"
+
+@auth_routes.route("/login", methods=["POST"])
+def login():
+    if request.method == "POST":
+        email = request.json.get("email", None)
+        password = request.json.get("password", None)
+
+        if not email:
+            return "Missing email", 400
+            
+        if not password:
+            return "Missing password", 400
+
+        user = User.query.filter_by(email=email).first() 
+        if not user:
+            return "User not found!", 404
+        
+        password = password.encode('utf-8')
+        if bcrypt.checkpw(password, user.hash):
+            return f"Welcome back {email}"
+        else:
+            return "Incorrect Password"
